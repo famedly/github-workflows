@@ -1,0 +1,32 @@
+---
+name: Ansible Lint
+on:
+  workflow_call:
+    inputs:
+      target:
+        type: string
+        required: false
+        default: --show-relpath
+      collection:
+        type: string
+        required: true
+jobs:
+  lint:
+    name: "Run Ansible lint on ${{ inputs.target }}"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set env
+        run: |
+         echo "collection_path=ansible_collections/famedly/${{ inputs.collection }}" >> "$GITHUB_ENV"
+      - name: Set second part of env because apparently new env variables aren't actually usable until the next step
+        run: |
+         echo "target_path=${{ env.collection_path }}/${{ inputs.target }}/*" >> "$GITHUB_ENV"
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: "${{ env.collection_path }}"
+      - name: Run Ansible Lint
+        # if: hashFiles(env.target_path) != ''
+        uses: famedly/ansible-lint-action@main
+        with:
+          path: ${{ inputs.target }}

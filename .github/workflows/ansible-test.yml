@@ -1,0 +1,41 @@
+---
+name: Ansible Test
+on:
+  workflow_call:
+    inputs:
+      collection:
+        type: string
+        required: true
+      testing-type:
+        type: string
+        required: true
+      python_version:
+        type: string
+        required: false
+        default: "3.11"
+      ansible_version:
+        type: string
+        required: false
+        default: "7.2.0"
+jobs:
+  test:
+    name: "Run ${{ inputs.testing-type }} tests"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set env
+        run: |
+          echo "collection_path=ansible_collections/famedly/${{ inputs.collection }}" >> "$GITHUB_ENV"
+      - name: Set second part of env because apparently new env variables aren't actually usable until the next step
+        run: |
+          echo "tests_path=${{ env.collection_path }}/tests/${{ inputs.testing-type }}/*" >> "$GITHUB_ENV"
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: ${{ env.collection_path }}
+      - name: Run tests
+        if: hashFiles(env.tests_path) != ''
+        uses: famedly/ansible-test-gh-action@main
+        with:
+          testing-type: ${{ inputs.testing-type }}
+          # docker-image: "registry.gitlab.com/famedly/infra/containers/ansible-test-suite:py${{ inputs.python_version }}-ansible${{ inputs.ansible_version }}"
+          target-python-version: ${{ inputs.python_version }}
