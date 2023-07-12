@@ -8,21 +8,21 @@ on:
         required: true
 jobs:
   lint:
-    uses: ./.github/workflows/ansible-lint.yml
+    uses: famedly/github-workflows/.github/workflows/ansible-lint.yml
     with:
       collection: ${{ inputs.collection }}
   test-units:
-    uses: ./.github/workflows/ansible-test.yml
+    uses: famedly/github-workflows/.github/workflows/ansible-test.yml
     with:
       collection: ${{ inputs.collection }}
       testing-type: units
   test-sanity:
-    uses: ./.github/workflows/ansible-test.yml
+    uses: famedly/github-workflows/.github/workflows/ansible-test.yml
     with:
       collection: ${{ inputs.collection }}
       testing-type: sanity
   test-integration:
-    uses: ./.github/workflows/ansible-test.yml
+    uses: famedly/github-workflows/.github/workflows/ansible-test.yml
     with:
       collection: ${{ inputs.collection }}
       testing-type: integration
