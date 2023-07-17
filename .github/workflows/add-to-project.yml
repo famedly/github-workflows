@@ -1,19 +1,12 @@
----
-name: Add Issue to Project
-on:
-  workflow_call:
-    inputs:
-      project-url:
-        description: "URL of the Project to add the Issue to"
-        type: string
-        required: true
+name: Add issues to Infrastructure Project.
 
+on:
+  issues:
+    types:
+      - opened
 jobs:
   add-to-project:
-    name: Add issue to project
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/add-to-project@v0.5.0
-        with:
-          project-url: ${{ inputs.project-url }}
-          github-token: ${{ secrets.ADD_ISSUE_TO_PROJECT_PAT }}
+    uses: famedly/github-workflows/.github/workflows/add-to-project.yml@github-v1
+    with:
+      project-url: https://github.com/orgs/famedly/projects/6
+    secrets: inherit
