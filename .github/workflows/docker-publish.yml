@@ -1,0 +1,31 @@
+---
+name: Publish Docker Image
+
+on:
+  workflow_call:
+    inputs:
+      registry:
+        description: "Registry to upload images to"
+        default: ghcr.io
+        required: false
+        type: string
+      registry_user:
+        description: "Username for the container registry"
+        default: ${{ github.actor }}
+        required: false
+        type: string
+      image_name:
+        description: "Name of the image to be pushed"
+        default: ${{ github.repository }}
+        required: false
+        type: string
+
+jobs:
+  build-and-push:
+    uses: famedly/github-workflows/.github/workflows/docker.yml@docker-v1
+    with:
+      registry: ${{ inputs.registry }}
+      image_name: ${{ inputs.image_name }}
+      registry_user: ${{ inputs.registry_user }}
+      push: true
+    secrets: inherit
