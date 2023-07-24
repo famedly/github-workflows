@@ -26,3 +26,5 @@ jobs:
     with:
       collection: ${{ inputs.collection }}
       testing-type: integration
+  black:
+    uses: famedly/github-workflows/.github/workflows/black.yml
