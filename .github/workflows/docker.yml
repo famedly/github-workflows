@@ -135,5 +135,5 @@ jobs:
       -
         name: Inspect image
         run: |
-          docker buildx imagetools inspect ${{ inouts.image_name }}:${{ steps.meta.outputs.version }}
+          docker buildx imagetools inspect ${{ inputs.image_name }}:${{ steps.meta.outputs.version }}
 
