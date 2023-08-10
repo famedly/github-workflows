@@ -11,12 +11,12 @@ on:
         type: string
       registry_user:
         description: "Username for the container registry"
-        default: ${{ github.actor }}
+        default: ${{ github.repository_owner }}
         required: false
         type: string
       image_name:
         description: "Name of the image to be pushed"
-        default: ${{ github.repository }}
+        default: ${{ github.repository }}/test
         required: false
         type: string
       artifact_name:
@@ -36,7 +36,7 @@ jobs:
       matrix:
         platform:
           - linux/amd64
-          - linux/arm64
+         # - linux/arm64
     permissions:
       contents: read
       packages: write
@@ -63,7 +63,7 @@ jobs:
         with:
           registry: ${{ inputs.registry }}
           username: ${{ inputs.registry_user }}
-          password: ${{ secrets.registry_password || secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.registry_password || github.token }}
 
       - name: Extract Docker metadata
         id: meta
@@ -82,15 +82,17 @@ jobs:
           platforms: ${{ matrix.platform }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          outputs: type=image,name=${{ inputs.image_name }},push-by-digest=${{ inputs.push }},name-canonical=true,push=${{ inputs.push }}
+          outputs: type=image,name=${{ inputs.image_name }},push-by-digest=true,name-canonical=true,push=${{ inputs.push }}
 
       - name: Export digest
+        if: inputs.push
         run: |
           mkdir -p /tmp/digests
           digest="${{ steps.build.outputs.digest }}"
           touch "/tmp/digests/${digest#sha256:}"
 
       - name: Upload digest
+        if: inputs.push
         uses: actions/upload-artifact@v3
         with:
           name: digests
