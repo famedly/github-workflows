@@ -11,7 +11,7 @@ on:
         type: string
       registry_user:
         description: "Username for the container registry"
-        default: ${{ github.actor }}
+        default: ${{ github.repository_owner }}
         required: false
         type: string
       image_name:
