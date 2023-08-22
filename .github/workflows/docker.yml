@@ -23,11 +23,6 @@ on:
         description: "Name of the artifact to be downloaded before"
         required: false
         type: string
-      platforms:
-        description: "Platforms to build for"
-        default: [linux/amd64, linux/arm64]
-        required: false
-        type: array
       push:
         description: "Whether to push the image, or just build"
         required: true
@@ -39,7 +34,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: ${{ inputs.platforms }}
+        platform:
+          - linux/amd64
+          - linux/arm64
     permissions:
       contents: read
       packages: write
