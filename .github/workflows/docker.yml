@@ -82,7 +82,6 @@ jobs:
         with:
           context: .
           push: ${{ inputs.push }}
-          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: ${{ matrix.platform }}
           build-args: ${{ inputs.build_args }}
@@ -137,9 +136,9 @@ jobs:
         working-directory: /tmp/digests
         run: |
           docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf '${{ inputs.image_name }}@sha256:%s ' *)
+            $(printf '${{ inputs.registry }}/${{ inputs.image_name }}@sha256:%s ' *)
       -
         name: Inspect image
         run: |
-          docker buildx imagetools inspect ${{ inputs.image_name }}:${{ steps.meta.outputs.version }}
+          docker buildx imagetools inspect ${{ inputs.registry }}/${{ inputs.image_name }}:${{ steps.meta.outputs.version }}
 
