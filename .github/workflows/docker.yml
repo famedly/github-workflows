@@ -27,6 +27,11 @@ on:
         description: "Whether to push the image, or just build"
         required: true
         type: boolean
+      build_args:
+        description: "List of build arguments, as an array inside a string"
+        required: false
+        default: "[]"
+        type: string
 
 jobs:
   docker:
@@ -80,9 +85,10 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: ${{ matrix.platform }}
+          build-args: ${{ inputs.build_args }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          outputs: type=image,name=${{ inputs.registry }}/${{ inputs.image_name }},push-by-digest=${{ inputs.push }},name-canonical=true,push=${{ inputs.push }}
+          outputs: type=image,push-by-digest=${{ inputs.push }},push=${{ inputs.push }}
 
       - name: Export digest
         run: |
