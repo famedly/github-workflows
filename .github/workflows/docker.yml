@@ -19,6 +19,15 @@ on:
         default: ${{ github.repository }}
         required: false
         type: string
+      tags:
+        description: "Custom tags to build"
+        default: |
+          type=schedule
+          type=ref,event=branch
+          type=ref,event=tag
+          type=ref,event=pr
+        required: false
+        type: string
       artifact_name:
         description: "Name of the artifact to be downloaded before"
         required: false
@@ -75,6 +84,7 @@ jobs:
         uses: famedly/metadata-action@v4
         with:
           images: ${{ inputs.registry }}/${{ inputs.image_name }}
+          tags: ${{ inputs.tags }}
 
       - name: Build and push Docker image
         id: build
@@ -124,6 +134,7 @@ jobs:
         uses: famedly/metadata-action@v4
         with:
           images: ${{ inputs.registry }}/${{ inputs.image_name }}
+          tags: ${{ inputs.tags }}
 
       - name: Log into registry ${{ inputs.registry }}
         uses: famedly/login-action@v2
