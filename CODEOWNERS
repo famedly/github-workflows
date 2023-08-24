@@ -1,1 +1,5 @@
-* @famedly/infrastructure
+* @famedly/infrastructure @famedly/workflows @famedly/instant-messaging
+
+.github/workflows/ansible*.yml @famedly/infrastructure
+.github/workflows/docker.yml @famedly/infrastructure
+.github/workflows/black.yml @famedly/infrastructure
