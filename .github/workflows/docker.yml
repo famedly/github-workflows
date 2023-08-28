@@ -32,6 +32,11 @@ on:
         description: "Name of the artifact to be downloaded before"
         required: false
         type: string
+      artifact_path:
+        description: "Directory where the artifact should be unpacked"
+        required: false
+        default: .
+        type: string
       push:
         description: "Whether to push the image, or just build"
         required: true
@@ -70,6 +75,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ${{inputs.artifact_name}}
+          path: ${{inputs.artifact_path}}
 
       - name: Log into registry ${{ inputs.registry }}
         if: inputs.push
