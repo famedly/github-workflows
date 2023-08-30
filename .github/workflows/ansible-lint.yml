@@ -5,28 +5,41 @@ on:
     inputs:
       target:
         type: string
-        required: false
-        default: --show-relpath
+        required: true
       collection:
         type: string
         required: true
+
 jobs:
   lint:
-    name: "Run Ansible lint on ${{ inputs.target }}"
+    strategy:
+      matrix:
+        python_version:
+          - "3.11"
+        ansible_version:
+          - "8.3.0"
+
+    name: "Run Ansible lint"
     runs-on: ubuntu-latest
+    container: docker-oss.nexus.famedly.de/ansible:py-${{ matrix.python_version }}-ansible-${{ matrix.ansible_version }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: "ansible_collections/${{ inputs.collection }}"
+
     steps:
-      - name: Set env
-        run: |
-         echo "collection_path=ansible_collections/famedly/${{ inputs.collection }}" >> "$GITHUB_ENV"
-      - name: Set second part of env because apparently new env variables aren't actually usable until the next step
-        run: |
-         echo "target_path=${{ env.collection_path }}/${{ inputs.target }}/*" >> "$GITHUB_ENV"
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          path: "${{ env.collection_path }}"
+          submodules: recursive
+          path: "ansible_collections/${{ inputs.collection }}"
+
       - name: Run Ansible Lint
-        # if: hashFiles(env.target_path) != ''
-        uses: famedly/ansible-lint-action@main
-        with:
-          path: ${{ inputs.target }}
+        run: |
+          ansible-lint \
+          --offline \
+          --profile safety \
+          --skip-list "name[play],name[template],fqcn[action-core],no-tabs" \
+          --enable-list "no-handler,no-relative-paths,ignore-errors,meta-incorrect,meta-no-info,meta-no-tags,fqcn" \
+          ${{ inputs.target }}
+

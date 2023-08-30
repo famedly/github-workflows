@@ -2,12 +2,30 @@
 name: Black formatting
 on:
   workflow_call:
+    inputs:
+      collection:
+        type: string
+        required: true
 jobs:
   black:
+    strategy:
+      matrix:
+        python_version:
+          - "3.11"
+        ansible_version:
+          - "8.3.0"
+    name: "Run Black"
     runs-on: ubuntu-latest
+    container: docker-oss.nexus.famedly.de/ansible:py-${{ matrix.python_version }}-ansible-${{ matrix.ansible_version }}
+
     steps:
-      - uses: actions/checkout@v3
-      - uses: famedly/black@stable
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          path: "ansible_collections/${{ inputs.collection }}"
+
+      - name: Run Black
+        uses: famedly/black@stable
         with:
           options: "--check --verbose"
-          src: "plugins tests"

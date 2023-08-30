@@ -3,39 +3,67 @@ name: Ansible Test
 on:
   workflow_call:
     inputs:
-      collection:
-        type: string
-        required: true
       testing-type:
         type: string
         required: true
-      python_version:
+      collection:
         type: string
-        required: false
-        default: "3.11"
-      ansible_version:
-        type: string
-        required: false
-        default: "7.2.0"
+        required: true
+     
 jobs:
   test:
-    name: "Run ${{ inputs.testing-type }} tests"
+    strategy:
+      matrix:
+        python_version:
+          - "3.9"
+          - "3.10"
+          - "3.11"
+        ansible_version:
+          - "7.7.0"
+          - "8.3.0"
+
+    name: Run ${{ inputs.testing-type }} tests on Ansible ${{ matrix.ansible_version }} and Python ${{ matrix.python_version }}
     runs-on: ubuntu-latest
+    container: docker-oss.nexus.famedly.de/ansible:py-${{ matrix.python_version }}-ansible-${{ matrix.ansible_version }}
+    env:
+      TESTING_PATH: ${{ inputs.testing-type == 'units' && 'unit' || inputs.testing-type }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: "ansible_collections/${{ inputs.collection }}"
+
     steps:
-      - name: Set env
-        run: |
-          echo "collection_path=ansible_collections/famedly/${{ inputs.collection }}" >> "$GITHUB_ENV"
-      - name: Set second part of env because apparently new env variables aren't actually usable until the next step
-        run: |
-          echo "tests_path=${{ env.collection_path }}/tests/${{ inputs.testing-type }}/*" >> "$GITHUB_ENV"
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          path: ${{ env.collection_path }}
+          submodules: recursive
+          path: "ansible_collections/${{ inputs.collection }}"
+
+        
+      - name: Prepare env
+        run: |
+          export SUBMODULES=$(for path in $(git submodule --quiet foreach pwd); do echo "${path#$(pwd)/}/"; done)
+          echo "EXCLUDE=${SUBMODULES:+--exclude ${SUBMODULES}}" >> $GITHUB_ENV
+          echo "HAS_TESTS=$([[ -d "tests/${{ env.TESTING_PATH }}" ]] && echo true || echo false )" >> $GITHUB_ENV
+
       - name: Run tests
-        if: hashFiles(env.tests_path) != ''
-        uses: famedly/ansible-test-gh-action@main
+        id: test
+        if: env.HAS_TESTS == 'true' # Yes, this is neccessary, because github converts this to a string and the string `false` is considered truthy...
+        run: |
+          ansible-test \
+          ${{ inputs.testing-type }} \
+          --coverage ${{ env.EXCLUDE }}
+
+      - name: Generate coverage report
+        if: env.HAS_TESTS == 'true' # Yes, this is neccessary, because github converts this to a string and the string `false` is considered truthy...
+        run: |
+          ansible-test coverage report
+          ansible-test coverage xml
+
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v3
         with:
-          testing-type: ${{ inputs.testing-type }}
-          # docker-image: "registry.gitlab.com/famedly/infra/containers/ansible-test-suite:py${{ inputs.python_version }}-ansible${{ inputs.ansible_version }}"
-          target-python-version: ${{ inputs.python_version }}
+          name: ansible-test-${{ env.TESTING_PATH }}-${{ matrix.ansible_version }}-${{ matrix.python_version }}
+          path: "ansible_collections/${{ inputs.collection }}/tests/output/"
+          if-no-files-found: ignore
+
