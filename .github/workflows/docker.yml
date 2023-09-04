@@ -46,6 +46,11 @@ on:
         required: false
         default: "[]"
         type: string
+      file:
+        description: "Path to the Dockerfile. (default `Dockerfile`)"
+        required: false
+        default: "Dockerfile"
+        type: string
 
 jobs:
   docker:
@@ -104,6 +109,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           platforms: ${{ matrix.platform }}
           build-args: ${{ inputs.build_args }}
+          file: ${{ inputs.file }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           sbom: true
