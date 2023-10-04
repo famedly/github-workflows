@@ -39,6 +39,10 @@ jobs:
           export SUBMODULES=$(for path in $(git submodule --quiet foreach pwd); do echo "${path#$(pwd)/}/"; done)
           echo "EXCLUDE=${SUBMODULES:+--exclude ${SUBMODULES}}" >> $GITHUB_ENV
 
+      - name: Install galaxy dependencies
+        run: |
+          find . -iname 'requirements.yml' -exec ansible-galaxy install -r {} \;
+
       - name: Run Ansible Lint
         run: |
           ansible-lint \
