@@ -9,36 +9,36 @@ on:
 jobs:
   lint-roles:
     name: "Run ansible-lint"
-    uses: famedly/github-workflows/.github/workflows/ansible-lint.yml@ansible-v1
+    uses: ./.github/workflows/ansible-lint.yml
     with:
       collection: ${{ inputs.collection }}
       target: roles
   lint-playbooks:
     name: "Run ansible-lint"
-    uses: famedly/github-workflows/.github/workflows/ansible-lint.yml@ansible-v1
+    uses: ./.github/workflows/ansible-lint.yml
     with:
       collection: ${{ inputs.collection }}
       target: playbooks
   test-units:
     name: "Run unit tests"
-    uses: famedly/github-workflows/.github/workflows/ansible-test.yml@ansible-v1
+    uses: ./.github/workflows/ansible-test.yml
     with:
       testing-type: units
       collection: ${{ inputs.collection }}
   test-sanity:
     name: "Run sanity tests"
-    uses: famedly/github-workflows/.github/workflows/ansible-test.yml@ansible-v1
+    uses: ./.github/workflows/ansible-test.yml
     with:
       testing-type: sanity
       collection: ${{ inputs.collection }}
   test-integration:
     name: "Run integration tests"
-    uses: famedly/github-workflows/.github/workflows/ansible-test.yml@ansible-v1
+    uses: ./.github/workflows/ansible-test.yml
     with:
       testing-type: integration
       collection: ${{ inputs.collection }}
   black:
     name: "Format using black"
-    uses: famedly/github-workflows/.github/workflows/black.yml@ansible-v1
+    uses: ./.github/workflows/black.yml
     with:
       collection: ${{ inputs.collection }}
