@@ -34,6 +34,11 @@ jobs:
           submodules: recursive
           path: "ansible_collections/${{ inputs.collection }}"
 
+      - name: Prepare env
+        run: |
+          export SUBMODULES=$(for path in $(git submodule --quiet foreach pwd); do echo "${path#$(pwd)/}/"; done)
+          echo "EXCLUDE=${SUBMODULES:+--exclude ${SUBMODULES}}" >> $GITHUB_ENV
+
       - name: Run Ansible Lint
         run: |
           ansible-lint \
@@ -41,5 +46,4 @@ jobs:
           --profile safety \
           --skip-list "name[play],name[template],fqcn[action-core],no-tabs" \
           --enable-list "no-handler,no-relative-paths,ignore-errors,meta-incorrect,meta-no-info,meta-no-tags,fqcn" \
-          ${{ inputs.target }}
-
+          ${{ env.EXCLUDE }} ${{ inputs.target }}
