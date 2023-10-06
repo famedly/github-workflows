@@ -9,7 +9,7 @@ on:
       collection:
         type: string
         required: true
-     
+
 jobs:
   test:
     strategy:
@@ -39,20 +39,22 @@ jobs:
           submodules: recursive
           path: "ansible_collections/${{ inputs.collection }}"
 
-        
+
       - name: Prepare env
+        run: |
+          echo "HAS_TESTS=$([[ -d "tests/${{ env.TESTING_PATH }}" ]] && echo true || echo false )" >> $GITHUB_ENV
+
+      - name: Prepare exclude
+        if: inputs.testing-type != 'units'
         run: |
           export SUBMODULES=$(for path in $(git submodule --quiet foreach pwd); do echo "${path#$(pwd)/}/"; done)
           echo "EXCLUDE=${SUBMODULES:+--exclude ${SUBMODULES}}" >> $GITHUB_ENV
-          echo "HAS_TESTS=$([[ -d "tests/${{ env.TESTING_PATH }}" ]] && echo true || echo false )" >> $GITHUB_ENV
 
       - name: Run tests
         id: test
         if: env.HAS_TESTS == 'true' # Yes, this is neccessary, because github converts this to a string and the string `false` is considered truthy...
         run: |
-          ansible-test \
-          ${{ inputs.testing-type }} \
-          --coverage ${{ env.EXCLUDE }}
+          ansible-test ${{ inputs.testing-type }} --coverage ${{ env.EXCLUDE }}
 
       - name: Generate coverage report
         if: env.HAS_TESTS == 'true' # Yes, this is neccessary, because github converts this to a string and the string `false` is considered truthy...
@@ -66,4 +68,3 @@ jobs:
           name: ansible-test-${{ env.TESTING_PATH }}-${{ matrix.ansible_version }}-${{ matrix.python_version }}
           path: "ansible_collections/${{ inputs.collection }}/tests/output/"
           if-no-files-found: ignore
-
