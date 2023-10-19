@@ -28,6 +28,12 @@ on:
           type=ref,event=pr
         required: false
         type: string
+      flavor:
+        description: "Behaviour for custom tags for docker-metadata"
+        default: |
+          prefix=v
+        required: false
+        type: string
       artifact_name:
         description: "Name of the artifact to be downloaded before"
         required: false
@@ -94,6 +100,7 @@ jobs:
         with:
           images: ${{ inputs.registry }}/${{ inputs.image_name }}
           tags: ${{ inputs.tags }}
+          flavor: ${{ inputs.flavor }}
 
       - name: Build and push Docker image
         id: build
@@ -149,6 +156,7 @@ jobs:
         with:
           images: ${{ inputs.registry }}/${{ inputs.image_name }}
           tags: ${{ inputs.tags }}
+          flavor: ${{ inputs.flavor }}
 
       - name: Log into registry ${{ inputs.registry }}
         uses: famedly/login-action@v2
