@@ -15,18 +15,22 @@ jobs:
       - name: Prepare dependencies
         run: |
           rustup update stable
+          rustup target add x86_64-unknown-linux-musl
           cargo install cargo-auditable
 
       - name: Extract crate information
         id: crate_metadata
         run: |
-          cargo metadata --no-deps --format-version 1 | jq -r '[.packages[0].targets[] | select(.kind == ["bin"]) | "./target/release/" + .name ] | join(" ") | "binary_targets=\"" + . + "\""' | tee -a $GITHUB_OUTPUT
+          cargo metadata --no-deps --format-version 1 | jq -r '[.packages[0].targets[] | select(.kind == ["bin"]) | .name ] | [.[] | {name: ., target:["x86_64-unknown-linux-musl"][]}] | [.[] | .name + "-" + .target ] | join(" ") | "binary_targets=" + .' | tee -a $GITHUB_OUTPUT
+          cargo metadata --no-deps --format-version 1 | jq -r '[.packages[0].targets[] | select(.kind == ["bin"]) | .name ] | [.[] | {name: ., target:["x86_64-unknown-linux-musl"][]}] | [.[] | "cp ./target/" + .target + "/release/" + .name + " " + .name + "-" + .target ] | join("; ") | "binary_copies=" + .' | tee -a $GITHUB_OUTPUT
 
       - name: Clippy
         run: cargo clippy
 
       - name: Build
-        run: cargo auditable build --release
+        run: |
+          cargo auditable build --release --target x86_64-unknown-linux-musl
+          sh -c "${{ steps.crate_metadata.outputs.binary_copies }}"
 
       - name: Create release
         env:
