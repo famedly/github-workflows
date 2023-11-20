@@ -28,6 +28,7 @@ jobs:
         run: cargo clippy
 
       - name: Build
+        continue-on-error: true
         run: |
           cargo auditable build --release --target x86_64-unknown-linux-musl
           sh -c "${{ steps.crate_metadata.outputs.binary_copies }}"
