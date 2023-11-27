@@ -27,6 +27,7 @@ jobs:
       - name: Prepare dependencies
         run: |
           rustup update stable
+          sudo apt install -y musl-dev musl-tools
           rustup target add x86_64-unknown-linux-musl
           cargo install cargo-auditable
 
