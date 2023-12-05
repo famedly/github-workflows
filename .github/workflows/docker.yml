@@ -106,6 +106,7 @@ jobs:
           build-args: ${{ inputs.build_args }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          sbom: true
           outputs: type=image,name=${{ inputs.registry }}/${{ inputs.image_name }},push-by-digest=${{ inputs.push }},name-canonical=true,push=${{ inputs.push }}
 
       - name: Get actual tag
