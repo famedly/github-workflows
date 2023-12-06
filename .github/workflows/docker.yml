@@ -168,3 +168,7 @@ jobs:
         run: |
           docker buildx imagetools inspect ${{ inputs.registry }}/${{ inputs.image_name }}:${{ steps.meta.outputs.version }}
 
+      - name: Inspect sbom
+        run: |  
+          docker buildx imagetools inspect ${{ inputs.registry }}/${{ inputs.image_name }}:${{ steps.meta.outputs.version }} --format '{{ json .SBOM }}' | jq
+
