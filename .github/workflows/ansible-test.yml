@@ -16,11 +16,13 @@ jobs:
       matrix:
         python_version:
           - "3.9"
-          - "3.10"
-          - "3.11"
+          - "3.12"
         ansible_version:
-          - "7.7.0"
-          - "8.3.0"
+          - "8.7.0"
+          - "9.0.1"
+        exclude:
+          - python_base_version: "3.12"
+            ansible_version: "8.7.0"
 
     name: Run ${{ inputs.testing-type }} tests on Ansible ${{ matrix.ansible_version }} and Python ${{ matrix.python_version }}
     runs-on: ubuntu-latest
