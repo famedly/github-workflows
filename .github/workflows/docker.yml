@@ -54,8 +54,8 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-          - linux/amd64
-          - linux/arm64
+          - amd64
+          - arm64
     permissions:
       contents: read
       packages: write
@@ -102,7 +102,7 @@ jobs:
           context: .
           push: ${{ inputs.push }}
           labels: ${{ steps.meta.outputs.labels }}
-          platforms: ${{ matrix.platform }}
+          platforms: linux/${{ matrix.platform }}
           build-args: ${{ inputs.build_args }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -123,7 +123,7 @@ jobs:
       - name: Upload digest
         uses: actions/upload-artifact@v4
         with:
-          name: digests-${{ inputs.registry }}-${{ inputs.image_name }}-${{ steps.tag.outputs.tags }}
+          name: digests-${{ inputs.registry }}-${{ inputs.image_name }}-${{ steps.tag.outputs.tags }}-${{ matrix.platform }}
           path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1
@@ -138,8 +138,9 @@ jobs:
       - name: Download digests
         uses: actions/download-artifact@v4
         with:
-          name: digests-${{ inputs.registry }}-${{ inputs.image_name }}-${{ needs.docker.outputs.tags }}
           path: /tmp/digests
+          pattern: digests-${{ inputs.registry }}-${{ inputs.image_name }}-${{ needs.docker.outputs.tags }}-*
+          merge-multiple: true
 
       - name: Set up Docker Buildx
         uses: famedly/setup-buildx-action@v2
