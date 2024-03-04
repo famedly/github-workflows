@@ -24,6 +24,11 @@ jobs:
         run: |
           sudo apt install -y ${{ inputs.extra_build_dependencies }}
 
+      - name: Prepare login for private repos
+        uses: famedly/backend-build-workflows/.github/actions/rust-prepare@main
+        with:
+          gitlab_ssh: ${{ secrets.CI_SSH_PRIVATE_KEY}}
+
       - name: Prepare dependencies
         run: |
           rustup update stable
