@@ -36,7 +36,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
           path: "ansible_collections/${{ inputs.collection }}"
@@ -65,7 +65,7 @@ jobs:
           ansible-test coverage xml
 
       - name: Upload test artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ansible-test-${{ env.TESTING_PATH }}-${{ matrix.ansible_version }}-${{ matrix.python_version }}
           path: "ansible_collections/${{ inputs.collection }}/tests/output/"
