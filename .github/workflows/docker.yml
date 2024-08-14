@@ -54,13 +54,15 @@ on:
 
 jobs:
   docker:
-    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        platform:
-          - linux/amd64
-          - linux/arm64
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-latest
+          - platform: linux/arm64
+            runner: arm-ubuntu-latest-8core
+    runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
       packages: write
