@@ -58,9 +58,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-            - platform: linux/amd64
+            - platform: amd64
               runner: ubuntu-latest-16core
-            - platform: linux/arm64
+            - platform: arm64
               runner: arm-ubuntu-latest-16core
     runs-on: ${{ matrix.runner }}
     permissions:
