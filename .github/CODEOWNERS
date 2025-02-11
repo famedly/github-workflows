@@ -1,4 +1,4 @@
-* @famedly/infrastructure @famedly/workflows @famedly/instant-messaging
+* @famedly/infrastructure @famedly/workflows @famedly/instant-messaging @famedly/matrix-team
 
 .github/workflows/ansible*.yml @famedly/infrastructure
 .github/workflows/docker.yml @famedly/infrastructure
