@@ -19,6 +19,14 @@ on:
         default: ${{ github.repository }}
         required: false
         type: string
+      flavor:
+        description: "Flavor behavior, such as 'latest' and prefix and suffix information"
+        required: false
+        type: string
+        default: |
+          latest=auto
+          prefix=
+          suffix=
       tags:
         description: "Custom tags to build"
         default: |
@@ -113,6 +121,7 @@ jobs:
         with:
           images: ${{ inputs.registry }}/${{ inputs.image_name }}
           tags: ${{ inputs.tags }}
+          flavor: ${{ inputs.flavor }}
 
       - name: Build and push Docker image
         id: build
@@ -177,6 +186,7 @@ jobs:
         with:
           images: ${{ inputs.registry }}/${{ inputs.image_name }}
           tags: ${{ inputs.tags }}
+          flavor: ${{ inputs.flavor }}
 
       - name: Log into registry ${{ inputs.registry }}
         uses: docker/login-action@v3
