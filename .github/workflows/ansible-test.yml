@@ -26,7 +26,7 @@ jobs:
 
     name: Run ${{ inputs.testing-type }} tests on Ansible ${{ matrix.ansible_version }} and Python ${{ matrix.python_version }}
     runs-on: ubuntu-latest
-    container: docker-oss.nexus.famedly.de/ansible:py-${{ matrix.python_version }}-ansible-${{ matrix.ansible_version }}
+    container: registry.famedly.net/docker-oss/ansible:py-${{ matrix.python_version }}-ansible-${{ matrix.ansible_version }}
     env:
       TESTING_PATH: ${{ inputs.testing-type == 'units' && 'unit' || inputs.testing-type }}
     defaults:

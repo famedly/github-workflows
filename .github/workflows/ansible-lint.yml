@@ -21,7 +21,7 @@ jobs:
 
     name: "Run Ansible lint"
     runs-on: ubuntu-latest
-    container: docker-oss.nexus.famedly.de/ansible:py-${{ matrix.python_version }}-ansible-${{ matrix.ansible_version }}
+    container: registry.famedly.net/docker-oss/ansible:py-${{ matrix.python_version }}-ansible-${{ matrix.ansible_version }}
     defaults:
       run:
         shell: bash
