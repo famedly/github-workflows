@@ -158,6 +158,11 @@ jobs:
       - docker
 
     steps:
+      - name: Create cleaned up registry variable
+        id: clean_registry
+        run: |
+          echo "clean_registry=$(echo '${{ inputs.registry }}' | sed 's/\//-/g')" >> $GITHUB_OUTPUT
+
       - name: Download digests
         uses: actions/download-artifact@v4
         with:
