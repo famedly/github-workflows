@@ -79,6 +79,8 @@ jobs:
 
     outputs:
       tags: ${{ steps.tag.outputs.tags }}
+      clean_registry: ${{ steps.clean_artifact_names.outputs.clean_registry }}
+      clean_image_name: ${{ steps.clean_artifact_names.outputs.clean_image_name }}
 
     steps:
       - name: Checkout repository
@@ -133,9 +135,10 @@ jobs:
           echo "tags=$(echo '${{ toJSON(fromJSON(steps.meta.outputs.json).tags) }}' | jq 'if (type) == "array" then .[0] else . end' | sed 's/\"//g' | cut -d ':' -f 2)" >> $GITHUB_OUTPUT
 
       - name: Create cleaned up registry variable
-        id: clean_registry
+        id: clean_artifact_names
         run: |
           echo "clean_registry=$(echo '${{ inputs.registry }}' | sed 's/\//-/g')" >> $GITHUB_OUTPUT
+          echo "clean_image_name=$(echo '${{ inputs.image_name }}' | sed 's/\//-/g')" >> $GITHUB_OUTPUT
 
       - name: Export digest
         run: |
@@ -146,7 +149,7 @@ jobs:
       - name: Upload digest
         uses: actions/upload-artifact@v4
         with:
-          name: digests-${{ steps.clean_registry.outputs.clean_registry }}-${{ inputs.image_name }}-${{ steps.tag.outputs.tags }}-${{ matrix.platform }}
+          name: digests-${{ steps.clean_artifact_names.outputs.clean_registry }}-${{ steps.clean_artifact_names.outputs.clean_image_name }}-${{ steps.tag.outputs.tags }}-${{ matrix.platform }}
           path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1
@@ -158,16 +161,11 @@ jobs:
       - docker
 
     steps:
-      - name: Create cleaned up registry variable
-        id: clean_registry
-        run: |
-          echo "clean_registry=$(echo '${{ inputs.registry }}' | sed 's/\//-/g')" >> $GITHUB_OUTPUT
-
       - name: Download digests
         uses: actions/download-artifact@v4
         with:
           path: /tmp/digests
-          pattern: digests-${{ steps.clean_registry.outputs.clean_registry }}-${{ inputs.image_name }}-${{ needs.docker.outputs.tags }}-*
+          pattern: digests-${{ needs.docker.outputs.clean_registry }}-${{ needs.docker.outputs.clean_image_name }}-${{ needs.docker.outputs.tags }}-*
           merge-multiple: true
 
       - name: Set up Docker Buildx
