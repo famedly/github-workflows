@@ -82,7 +82,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@900f2210b1d28bbbd0bd22d17926b9e224e8f231
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@7f9aaaffa50b7aa9d8d6f147ed9a1be21f255d98
@@ -92,7 +92,7 @@ jobs:
 
       - name: Download artifact
         if: ${{ inputs.artifact_name != '' }}
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@484a0b528fb4d7bd804637ccb632e47a0e638317
         with:
           name: ${{inputs.artifact_name}}
           path: ${{inputs.artifact_path}}
@@ -144,7 +144,7 @@ jobs:
           touch "/tmp/digests/${digest#sha256:}"
 
       - name: Upload digest
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: digests-${{ steps.clean_registry.outputs.clean_registry }}-${{ inputs.image_name }}-${{ steps.tag.outputs.tags }}-${{ matrix.platform }}
           path: /tmp/digests/*
@@ -164,7 +164,7 @@ jobs:
           echo "clean_registry=$(echo '${{ inputs.registry }}' | sed 's/\//-/g')" >> $GITHUB_OUTPUT
 
       - name: Download digests
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@484a0b528fb4d7bd804637ccb632e47a0e638317
         with:
           path: /tmp/digests
           pattern: digests-${{ steps.clean_registry.outputs.clean_registry }}-${{ inputs.image_name }}-${{ needs.docker.outputs.tags }}-*
