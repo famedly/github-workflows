@@ -61,6 +61,11 @@ on:
         required: false
         default: ubuntu-latest
         type: string
+      gha_cache:
+        description: "Use the GitHub Actions cache for BuildKit layers and the QEMU binfmt image"
+        required: false
+        default: true
+        type: boolean
 
 jobs:
   docker:
@@ -86,6 +91,8 @@ jobs:
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
+        with:
+          cache-image: ${{ inputs.gha_cache }}
 
       - name: Setup Docker buildx
         uses: docker/setup-buildx-action@v3
@@ -122,8 +129,8 @@ jobs:
           platforms: linux/${{ matrix.platform }}
           build-args: ${{ inputs.build_args }}
           file: ${{ inputs.file }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: ${{ inputs.gha_cache && 'type=gha' || '' }}
+          cache-to: ${{ inputs.gha_cache && 'type=gha,mode=max' || '' }}
           sbom: true
           outputs: type=image,name=${{ inputs.registry }}/${{ inputs.image_name }},push-by-digest=${{ inputs.push }},name-canonical=true,push=${{ inputs.push }}
 
